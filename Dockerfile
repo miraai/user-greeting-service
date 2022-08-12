@@ -7,4 +7,4 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python3", "waitress_server.py" ]
+CMD ["gunicorn", "-w 2", "-b 0.0.0.0:9090", "wsgi:app"]
