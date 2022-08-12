@@ -1,21 +1,22 @@
+import os
 import json
 
-import redis
 from flask import Flask, request
-from waitress import serve
+from redis import StrictRedis
 from typing import Text, Optional, Dict, Any
-import logging
 
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = os.environ.get("REDIS_PORT", 6379)
+REDIS_DB = os.environ.get("REDIS_DB", 1)
+
+# Init Flask app.
 app = Flask(__name__)
-
-logger = logging.getLogger('waitress')
-logger.setLevel(logging.INFO)
+# Init Redis client.
+redis_client = StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 def get_current_user() -> Optional[Dict[Text, Any]]:
     """Retrieve the current user from intermediate storage."""
-
-    red = redis.StrictRedis(host="redis", port=6379, db=1)
-    encoded_user = red.get("user")
+    encoded_user = redis_client.get("user")
     if encoded_user:
         return json.loads(encoded_user)
     else:
@@ -23,9 +24,7 @@ def get_current_user() -> Optional[Dict[Text, Any]]:
 
 def store_user(user: Dict[Text, Any]) -> None:
     """Store a users details to our intermediate storage."""
-
-    red = redis.StrictRedis(host="redis", port=6379, db=1)
-    red.set("user", json.dumps(user))
+    redis_client.set("user", json.dumps(user))
 
 @app.route('/', methods=["GET"])
 def greet():
@@ -40,10 +39,6 @@ def greet():
 @app.route('/', methods=["POST"])
 def save_name():
     """Change a users details, most importantly his name."""
-
     user = request.json
     store_user(user)
     return "I'll try to remember your name, {}!".format(user.get("name"))
-
-# if __name__ == '__main__':
-#     app.run(host="0.0.0.0", port=9090, debug=True)
