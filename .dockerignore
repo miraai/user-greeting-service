@@ -3,6 +3,9 @@ Dockerfile
 .DS_Store
 .gitignore
 .dockerignore
+docker-compose.yml
+/k8s
+/nginx
 
 /credentials
 /cache
