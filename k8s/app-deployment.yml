@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-deployment
+  name: app
   labels:
     app: app
 spec:
@@ -16,8 +16,13 @@ spec:
     spec:
       containers:
       - name: app
-        image: miraai/user-greeting-service:v1
+        image: miraai/user-greeting-service:v2
         imagePullPolicy: IfNotPresent
+        env:
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
         ports:
         - containerPort: 9090
         resources: 
