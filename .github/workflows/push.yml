@@ -7,8 +7,8 @@ on:
       - completed
 
 jobs:
-  build_docker_base:
-    name: Build Docker base images and setup environment
+  build_docker:
+    name: Build Docker
     runs-on: ubuntu-20.04
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 

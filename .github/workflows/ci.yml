@@ -13,15 +13,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  setup:
-    name: Setup
-    runs-on: ubuntu-latest
+  build_env:
+    name: Build ENV
+    runs-on: ubuntu-20.04
 
     steps:
-      - name: Checkout git repository
+      # Due to an issue with checking out a wrong commit, we make sure
+      # to checkout HEAD commit for a pull request.
+      # More details: https://github.com/actions/checkout/issues/299
+      - name: Checkout pull request HEAD commit instead of merge commit 🕝
         uses: actions/checkout@v3
-
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+        if: github.event_name == 'pull_request'
         with:
-          python-version: 3.9
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Checkout git repository 🕝
+        uses: actions/checkout@v3
+        if: github.event_name != 'pull_request'
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
