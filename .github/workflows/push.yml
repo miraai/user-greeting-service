@@ -6,9 +6,6 @@ on:
     types:
       - completed
 
-env:
-  DOCKERHUB_USERNAME: miraai
-
 jobs:
   build_docker_base:
     name: Build Docker base images and setup environment
@@ -38,7 +35,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build and push
@@ -46,4 +43,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/user-greeting-service:v3
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/user-greeting-service:main-${{ github.sha }}
