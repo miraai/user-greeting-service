@@ -7,7 +7,6 @@ on:
     tags:
       - "*"
   pull_request:
-    types: [closed]
     
 concurrency:
   group: continous-integration-${{ github.ref }}
@@ -17,7 +16,6 @@ jobs:
   build_docker:
     name: Build Docker base images and setup environment
     runs-on: ubuntu-20.04
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       # Due to an issue with checking out a wrong commit, we make sure
@@ -47,7 +45,15 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v3
-        if: github.event.pull_request.merged == 'true'
+        if: github.event_name != 'pull_request'
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/user-greeting-service:main-${{ github.sha }}
+
+      - name: Build and push PR
+        uses: docker/build-push-action@v3
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == 'true'
         with:
           context: .
           push: true
