@@ -8,7 +8,7 @@ on:
       - "*"
   pull_request_target:
     types:
-      - review_requested
+      - labeled
 
 concurrency:
   group: continous-integration-${{ github.ref }}
@@ -30,8 +30,8 @@ jobs:
       #     ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout git repository 🕝
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.owner.login == 'miraai'
         uses: actions/checkout@v3
-        if: github.event_name != 'pull_request'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -47,7 +47,7 @@ jobs:
 
       - name: "[PR] Build and push"
         uses: docker/build-push-action@v3
-        if: github.event.review.state == 'approved'
+        if: contains(github.event.pull_request.labels.*.name, 'approved')
         with:
           context: .
           push: true
@@ -55,7 +55,7 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v3
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.owner.login == 'miraai'
         with:
           context: .
           push: true
