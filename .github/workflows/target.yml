@@ -45,9 +45,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build and push
+      - name: "[PR] Build and push"
         uses: docker/build-push-action@v3
         if: github.event.review.state == 'approved'
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/user-greeting-service:main-${{ github.sha }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         with:
           context: .
           push: true
