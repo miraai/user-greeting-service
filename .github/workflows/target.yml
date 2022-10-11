@@ -23,11 +23,11 @@ jobs:
       # Due to an issue with checking out a wrong commit, we make sure
       # to checkout HEAD commit for a pull request.
       # More details: https://github.com/actions/checkout/issues/299
-      # - name: Checkout pull request HEAD commit instead of merge commit 🕝
-      #   uses: actions/checkout@v3
-      #   if: github.event_name == 'pull_request'
-      #   with:
-      #     ref: ${{ github.event.pull_request.head.sha }}
+      - name: Checkout pull request HEAD commit instead of merge commit 🕝
+        uses: actions/checkout@v3
+        if: github.event_name == 'pull_request_target'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout git repository 🕝
         if: github.event_name != 'pull_request_target' || github.event.pull_request.head.repo.owner.login == 'miraai'
