@@ -34,7 +34,7 @@ def greet():
     if user is not None:
         return "Hello, {}!".format(user.get("name"))
     else:
-        return "Hello, unknown stranger!"
+        return "Hello from the other side!"
 
 @app.route('/', methods=["POST"])
 def save_name():
